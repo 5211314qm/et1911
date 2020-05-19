@@ -9,9 +9,12 @@
 		<artifactId>et1911</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>springmvc-01-hello</artifactId>
+	<artifactId>test-spring-mvc</artifactId>
 	<packaging>war</packaging>
 
+	<build>
+		<finalName>test-spring-mvc</finalName>
+	</build>
 	<dependencies>
 
 		<!-- servlet-api -->
@@ -27,8 +30,4 @@
 			<artifactId>spring-webmvc</artifactId>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<finalName>springmvc-01-hello</finalName>
-	</build>
 </project>
