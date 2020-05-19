@@ -3,7 +3,6 @@ package com.etoak.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/hello")
 public class HelloController {
