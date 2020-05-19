@@ -1,0 +1,35 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<!-- 配置前端控制器 -->
+	<servlet>
+		<servlet-name>et</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<!-- 
+				修改spring mvc容器的默认配置（位置和名称）
+				默认的文件：/WEB-INF/[servlet-name]-servlet.xml
+				对应这个配置，默认文件就是/WEB-INF/et-servlet.xml
+				
+				可以使用contextConfigLocation修改配置
+				classpath:spring-mvc.xml
+					-表示文件位置修改为classpath的根目录
+					-文件名为spring-mvc.xml
+			 -->
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring-mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>et</servlet-name>
+		<!-- 
+			1. *.action:表示拦截以.action结尾的请求
+			2. /*：表示拦截所有请求，包括jsp，这里不推荐使用/*
+			3. /:表示拦截所有请求,可以支持REST风格的请求，推荐使用
+		 -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+</web-app>
