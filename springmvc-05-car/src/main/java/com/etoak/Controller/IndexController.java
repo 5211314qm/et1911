@@ -1,0 +1,16 @@
+package com.etoak.Controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class IndexController {
+
+	
+	@RequestMapping("/index")
+	public String index() {
+		
+		// webapp/templates/index.html
+		return "index";
+	}
+}
