@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etoak.mapper.CarMapper">
+
+	<!-- 开启二级缓存10秒种清空缓存 -->
+	<cache flushInterval="10000"></cache>
+
+	<!-- useCache="false"表示不使用缓存 -->
+
+	<select id="queryList" useCache="false" parameterType="string"
+		resultType="dict">
+		SELECT id,
+		group_id AS groupId,
+		name,
+		value,
+		sort
+		FROM
+		t_springmvc_dict
+		where group_id = #{value}
+		ORDER BY sort
+	</select>
+
+	<insert id="addCar" parameterType="car">
+		INSERT INTO t_springmvc_car 
+		(
+			id,
+			brand,
+			series,
+			price,
+			licensing_time,
+			level,
+			gearbox,
+			output_volume,
+			mileage,
+			location,
+			pic,
+			summary,
+			create_time
+		)
+		values (
+			null,
+			#{brand},
+			#{series},
+			#{price},
+			#{licensingTime},
+			#{level},
+			#{gearbox},
+			#{outputVolume},
+			#{mileage},
+			#{location},
+			#{pic},
+			#{summary},
+			NOW()
+		)
+	</insert>
+
+
+
+</mapper>

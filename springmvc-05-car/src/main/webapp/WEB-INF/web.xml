@@ -3,6 +3,16 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
+
+	<!-- spring root容器 -->
+	<!-- 1、用于整合其他mvc框架(如struts2、struts1) -->
+	<!-- 2、用于加载中间层bean(如services、 dataSources、repositories) -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring-root.xml</param-value>
+	</context-param>
+
+	<!-- post请求编码过滤器 -->
 	<filter>
 		<filter-name>characterEncoding</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -11,12 +21,17 @@
 			<param-value>UTF-8</param-value>
 		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>characterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
+	<!-- 默认加载WEB-INF下的contextApplication.xml部署这个让他加载上面的 context-param中的classpath:spring-root.xml -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
 	<servlet>
 		<servlet-name>et1907</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -26,7 +41,7 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>et1907</servlet-name>
 		<url-pattern>/</url-pattern>
