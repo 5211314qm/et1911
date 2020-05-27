@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>汽车列表</title>
+<link rel="stylesheet"
+	th:href="@{/static/bootstrap/css/bootstrap.min.css}" />
+<style>
+.carPage {
+	width: 256px;;
+	margin: 0px auto;
+	padding: 20px 0px;;
+}
+</style>
+</head>
+<body>
+
+	<div class="panel panel-info">
+		<div class="panel-heading" role="tab" id="headingOne">
+			<h4 class="panel-title">
+				<a role="button" data-toggle="collapse" data-parent="#accordion"
+					href="#collapseOne" aria-expanded="true"
+					aria-controls="collapseOne"> 查询条件 </a>
+			</h4>
+		</div>
+		<div id="collapseOne" class="panel-collapse collapse in"
+			role="tabpanel" aria-labelledby="headingOne">
+			<div class="panel-body">
+				<form id="queryForm" class="form-horizontal" role="form">
+
+					<div class="form-group">
+						<label style="margin-left: 20px;">品牌:</label>
+						<span id="brand"></span>
+					</div>
+
+					<div class="form-group">
+						<label style="margin-left: 20px;">车系:</label> 
+						<span id="series"></span>
+					</div>
+
+					<div class="form-group">
+						<label style='margin-left:20px;'>价格:</label>
+						 <span id="price"></span>
+					</div>
+
+					<div class="form-group">
+						<label style="margin-left: 20px;">车龄:</label> 
+						<span id="vehicle_age"></span>
+					</div>
+
+					<div class="form-group">
+						<label style="margin-left: 20px;">级别:</label> 
+						<select id="level" style="height: 26px;" onchange="et1911.queryBySelect(this.value)"></select>
+						
+						<label style="margin-left: 20px;">变速箱:</label>
+						<select id="gearbox" style="height: 26px;" onchange="et1911.queryBySelect(this.value)"></select>
+					</div>
+
+					<div class="form-group">
+						<label style="margin-left: 20px;">排量:</label> 
+						<select id="output_volume" style="height: 26px;" onchange="et1911.queryBySelect(this.value)"></select>
+						<label style="margin-left: 20px;">归属地:</label>
+						<input id="location" name="location" style="width: 131.6px;" placeholder="归属地" />
+					</div>
+
+					<input type="button" class='btn btn-info' onclick="initForm()" value="清空筛选" />
+
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<div id="carList" class="row"></div>
+	</div>
+	<div class="carPage">
+		<button id="firstPage" class="btn btn-primary" type="button">首页</button>
+		<button id="prePage" class="btn btn-success" type="button">上一页</button>
+		<button id="nextPage" class="btn btn-warning" type="button">下一页</button>
+		<button id="lastPage" class="btn btn-danger" type="button">尾页</button>
+	</div>
+
+
+	<script th:src="@{/static/js/jquery/jquery.min.js}"
+		type="text/javascript"></script>
+	<script th:src="@{/static/bootstrap/js/bootstrap.min.js}"
+		type="text/javascript"></script>
+	<script th:inline="javascript" type="text/javascript">
+			const path = /*[[${#request.getContextPath()}]]*/
+			
+			
+			$(function(){
+				et1911.queryList();
+				et1911.getBrand();
+				et1911.getSeries();
+				// et1911.querySpan('price');
+				et1911.querySpan('vehicle_age');
+				et1911.getPriceDict();
+				//et1911.getVehicleAgeDict();
+				et1911.querySelectDict('level');
+				et1911.querySelectDict('gearbox');
+				et1911.querySelectDict('output_volume');
+				
+				$('#firstPage').click(function(){
+					et1911.queryList();
+				});
+				
+				$('#prePage').click(function(){
+					et1911.queryList(--currentPage);
+				});
+				
+				$('#nextPage').click(function(){
+					et1911.queryList(++currentPage);
+				});
+				
+				$('#lastPage').click(function(){
+					et1911.queryList(pageCount);
+				});
+				
+				$('#location').blur(function(){
+					locations = $('#location').val();
+					et1911.queryList();
+				})
+				
+				$('#price').change(function(){
+					et1911.queryList();
+				})
+				
+				
+				
+			})
+			
+			let currentPage = 1;
+			let pageCount;
+			let brand = ''
+			let series = ''
+			let price = ''
+			let licensing_time = ''
+			let level = ''
+			let gearbox = ''
+			let output_volume = ''
+			let locations = ''
+			let vehicleAge = ''
+			function initForm(){
+				brand = ''
+				series = ''
+				price = ''
+				licensing_time = ''
+				level = ''
+				gearbox = ''
+				output_volume = ''
+				locations = ''
+				vehicleAge = '' 
+				
+				$('input[type=checkbox]').removeAttr("checked");
+				
+				$('#level').val('')
+				$('#gearbox').val('')
+				$('#output_volume').val('')
+				$('#location').val('')
+				
+				et1911.getSeries(brand)
+				et1911.queryList()
+				
+			}
+			
+			let et1911 = {
+					
+				getPriceDict: function(){
+					$.ajax({
+						url: path + '/dict/price',
+						type: 'get',
+						data: '',
+						dataType: 'json',
+						async: false,
+						success: function(res){
+							let checkbox = ''
+							for(dict of res){
+								checkbox += 
+									`
+									<label class='checkbox-inline'>
+										<input type="checkbox" name='price' value='${dict.value}' />${dict.name}
+									</label>
+									`
+							}
+							$('#price').html(checkbox);
+						}
+					})
+					
+					
+				},	
+				
+				getVehicleAgeDict: function(){
+					$.ajax({
+						url: path + '/dict/vehicle_age',
+						type: 'get',
+						data: '',
+						dataType: 'json',
+						async: false,
+						success: function(res){
+							let radio = ''
+							for(dict of res){
+								radio += 
+									`
+									<label class='checkbox-inline'>
+										<input type="radio" name='vehicleAge' value='${dict.value}' />${dict.name}
+									</label>
+									`
+							}
+							$('#vehicle_age').html(radio);
+						}
+					})
+				},
+				
+				
+				queryList: function(pageNumber,pageSize){
+						
+						//如果pageNumber、pageSize不传(或者传入''、undefined'),这时取||后面的
+						pageNumber = pageNumber || 1
+						pageSize = pageSize || 8
+						
+						let priceList = []
+						$('input[name=price]:checked').each(function(){
+							priceList.push(this.value)
+						})
+						
+						
+						/* let vehicleAge = $('input[name=vehicleAge]:checked').val() || '' */
+						
+						$.ajax({
+							url: path + '/car/list',
+							type: 'get',
+							data:'pageNumber='+pageNumber + '&pageSize=' + pageSize
+							+'&brand='+ brand + '&series='+series+'&level='+level
+							+'&gearbox='+gearbox + '&outputVolume='+output_volume
+							+'&location=' + locations+'&priceList=' + priceList
+							+'&vehicleAge=' + vehicleAge,
+							dataType: 'json',
+							success: function(res){
+								
+								console.log(res);
+								// 当前页
+								currentPage = res.pageNum;
+								//总页数
+								pageCount = res.pageCount;
+								
+								let divs = "";
+								$.each(res.rows,function(index,car){
+									divs += `
+											<div class='col-md-3'>
+												<img class='img-thumbnail' style='height:350px; width:400px;' src="${path+car.pic}"/>
+												<p>${car.brand} / ${car.series} / ${car.location}</p>
+												<p>${car.price}万元 / ${car.gearboxName}</p>
+												<p>${car.licensingTime}</p>
+											</div>
+											`
+								});
+								$('#carList').html(divs);
+								
+								//
+								if(res.first){
+									$('#firstPage').attr('disabled','true');
+									$('#prePage').attr('disabled','disabled');
+								}else{
+									$('#firstPage').removeAttr('disabled');
+									$('#prePage').removeAttr('disabled');
+								}
+								
+								//
+								if(res.last){
+									$('#lastPage').attr('disabled','disabled');
+									$('#nextPage').attr('disabled','disabled');
+								}else{
+									$('#lastPage').removeAttr('disabled');
+									$('#nextPage').removeAttr('disabled');
+								}
+								
+							}
+						});
+					},
+					getBrand: function(){
+						$.ajax({
+							url: path + '/car/getBrand',
+							type: 'get',
+							data: '',
+							dataType: 'json',
+							success: function(res){
+								let str = '';
+								$.each(res,function(index,brand){
+									str += `
+											<span style='margin-right:20px;' onclick='et1911.queryByBrand("${brand}")' name='brand' value='${brand}'>${brand}</span>
+										  `
+								})
+								$('#brand').html(str);
+							}
+						})
+					},
+					queryByBrand: function(brands){
+						brand = brands;
+						et1911.getSeries(brand);
+						series = ''
+						et1911.queryList();
+					},
+					getSeries: function(brands){
+						$.ajax({
+							url: path + '/car/getSeries',
+							type: 'get',
+							data: {brand:brands},
+							dataType: 'json',
+							success: function(res){
+								let str = '';
+								$.each(res,function(index,series){
+									str += `
+												<span style='margin-right:20px;' onclick='et1911.queryBySeries("${series}")' name='series' value='${series}'>${series}</span>
+									  		`
+								})
+								$('#series').html(str);
+							}
+						})
+					},
+					
+					queryBySeries: function(data){
+						series = data
+						et1911.queryList();
+					},
+					
+					querySpan: function(groupId){
+						$.ajax({
+							url : path + '/dict/' + groupId,
+							type: 'GET',
+							data: '',
+							dataType: 'json',
+							success: function(data){
+								let str = '';
+								for(let dict of data){
+									str += 
+										`
+											<span value='${dict.value}' onclick='et1911.queryByVehicleAge("${dict.value}")' name='${dict.name}' style='margin-right:10px;'>${dict.name}</span>
+										`
+								}
+								$('#' + groupId).html(str);
+							}
+						});
+					},
+					
+					queryByVehicleAge: function(data){
+						vehicleAge = data
+						et1911.queryList()
+					},
+					
+					querySelectDict:function (groupId){
+						if(groupId){
+							$.ajax({
+								url : path + '/dict/' + groupId,
+								type: 'GET',
+								data: '',
+								dataType: 'json',
+								success: function(data){
+									let options = "<option value=''>====请选择====</option>";
+									for(let dict of data){
+										options += `<option name='${dict.name}' value='${dict.groupId},${dict.value}'>${dict.name}</option>`;
+									}
+									$('#'+groupId).html(options);
+								}
+							});
+						}			
+					},
+					queryBySelect: function(data){
+						let groupId = data.split(',')[0]
+						let value = data.split(',')[1]
+						level = groupId == 'level' ? value : level;
+						gearbox = groupId == 'gearbox' ? value : gearbox;
+						output_volume = groupId == 'output_volume' ? value : output_volume ;
+						et1911.queryList();
+								
+					}
+					
+			}
+			
+		</script>
+</body>
+</html>

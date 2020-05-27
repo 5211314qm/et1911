@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>汽车列表</title>
+		<link rel="stylesheet" th:href="@{/static/bootstrap/css/bootstrap.min.css}" />
+		<style>
+			#form{
+				background: url("/springmvc-05-car/pic/back.jpg");
+				padding-bottom: 10px;
+			}
+			#carMM,#form{
+				margin-top:20px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<img th:src="@{/pic/car.png}" style="width: 1518px; height: 170px;" />
+	
+		<div class="row" style="margin-bottom: 10px;">
+			<div class="col-sm-8">
+				<div id="form" style="padding-top:10px;">
+					<!-- 查询表单 -->
+					<form id="queryForm" class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" style="font-size:20px;">品牌:</label>
+							<div class="col-sm-8">
+								<span id="brand"></span>
+							</div>
+						</div>
+			
+						<div class="form-group">
+							<label class="col-sm-2 control-label" style="font-size:20px;">车系:</label>
+							<div class="col-sm-8" id="series"></div>
+						</div>
+			
+						<div class="form-group">
+							<label class="col-sm-2 control-label" style="font-size:20px;">价格:</label>
+							<div class="col-sm-8" id="price">
+								
+							</div>
+						</div>
+			
+						<div class="form-group">
+							<label class="col-sm-2 control-label" style="font-size:20px;">车龄:</label>
+							<div class="col-sm-8" id="vehicle_age">
+								
+							</div>
+						</div>
+						<div class="form-inline">
+							<div class="form-group">
+								<label for="level" class="col-sm-2 control-label" style="font-size:20px;margin-left: 64px;">级别:</label>
+								<div class="col-sm-3">
+									<select id="level" name="level"
+										class="form-control">
+										
+									</select>
+								</div>
+								
+								<label for="gearbox" class="col-sm-2 control-label" style="font-size:20px;margin-left:25px;">变速箱:</label>
+								<div class="col-sm-3">
+									<select id="gearbox" name="gearbox" 
+										class="form-control">
+										
+									</select>
+								</div>
+								
+							</div>
+	
+							<div class="form-group" style="margin:20px 0px;">
+								<label for="output_volume" class="col-sm-2 control-label" style="font-size:20px;margin-left: 48px">排量:</label>
+								<div class="col-sm-3">
+									<select id="output_volume" name="outputVolume"
+										class="form-control">
+										
+									</select>
+								</div>
+								
+								
+								<label for="location" class="col-sm-2 control-label" style="font-size:20px;margin-left: 29px">归属地:</label>
+								<div class="col-sm-3">
+									<input type="text" autocomplete="off" class="form-control" style="width: 160px;" placeholder="归属地"
+										name="location" id="location">
+								</div>
+							</div>
+				
+						</div>
+			
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<button type="button" onclick="initForm()"
+									class="btn btn-success">清空筛选</button>
+							</div>
+						</div>           
+					</form>
+				</div>
+			</div>
+			
+			<div class="col-sm-4">
+				<div id="carMM">
+					<img th:src="@{/pic/carMM.jpg}" style="height: 380px;width:485px" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="row" id="car">
+		   
+		</div>
+		<div style="text-align: center">
+            <button class="btn btn-primary" style="margin-left: 10px" id="first" type="button">首页</button>
+            <button class="btn btn-success" style="margin-left: 10px" id="pre" type="button">上一页</button>
+            <button class="btn btn-warning" style="margin-left: 10px" id="next" type="button">下一页</button>
+            <button class="btn btn-danger" style="margin-left: 10px" id="end" type="button">末页</button>
+        </div>
+        
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog" role="document">
+				 <div class="modal-content">
+				 	<div class="modal-header">
+				    	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				    	<h4 class="modal-title">图片详情</h4>
+				 	</div>
+				 	<div class="modal-body">
+				    	<div id="phono" style="text-align: center"></div>
+				  	</div>
+				  	<div class="modal-footer">
+				    	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  	</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		
+		<script th:src="@{/static/js/jquery/jquery.min.js}" type="text/javascript"></script>
+		<script th:src="@{/static/bootstrap/js/bootstrap.min.js}" type="text/javascript"></script>
+		<script th:inline="javascript" type="text/javascript">
+			const path = /*[[${#request.getContextPath()}]]*/
+			
+			$(function(){
+				queryBrand();
+				querySeries();
+				querySelectDict('level');
+				querySelectDict('gearbox');
+				querySelectDict('output_volume');
+				queryCar(pn,ps);
+				querySpan('price');
+				querySpan('vehicle_age');
+			})
+			
+		
+			function queryBrand(){
+				$.ajax({
+					url: path + '/car/queryBrand',
+					type: 'post',
+					dataType: 'json',
+					data: '',
+					success: function(data){
+						console.log(data);
+						let brands = "";
+						$.each(data,function(index,brand){
+							brands += index ==0?  
+								`<span style="font-size:20px;" onclick="queryByBrand('${brand}')">${brand}</span>`	
+								:
+                                `<span style="margin-left: 10px;font-size:20px;" onclick="queryByBrand('${brand}')">${brand}</span>`
+						})
+						
+						$('#brand').html(brands);
+						
+					}
+				});
+			}
+			
+			let brand = '';
+			let series = '';
+			let price = '';
+			let licensing_time = '';
+			let level = '';
+			let gearbox = '';
+			let output_volume = '';
+			let locations = '';
+			let priceList = '';
+			let vehicleAge = ''
+			
+			function queryByBrand(data){
+				brand = data
+				series = ''
+				querySeries(brand)
+				queryCar()
+			}
+			
+			function querySeries(brand){
+				$.post(
+					path + '/car/querySeries',
+					{brand:brand},
+					data => {
+						console.log(data);
+						let series = "";
+						$.each(data,function(i,p){
+							series += i==0?  `<span style="font-size:20px;" onclick="queryBySeries('${p}')">${p}</span>`
+											:
+                                			`<span style="margin-left: 10px;font-size:20px;" onclick="queryBySeries('${p}')">${p}</span>`;
+						})
+						
+						$('#series').html(series);
+					},
+					'json'
+				)
+			}
+			
+			function initForm(){
+				brand = ''
+				series = ''
+				price = ''
+				licensing_time = ''
+				level = ''
+				gearbox = ''
+				output_volume = ''
+				locations = ''
+				priceList = ''
+				vehicleAge = ''
+				
+				$('#level').val('')
+				$('#gearbox').val('')
+				$('#output_volume').val('')
+				$('#location').val('')
+			
+				querySeries(brand)
+				queryCar()
+				
+			}
+			
+			function queryBySeries(data){
+				series = data
+				queryCar()
+			}
+			
+			function querySelectDict(groupId){
+				if(groupId){
+					$.ajax({
+						url : path + '/dict/' + groupId,
+						type: 'GET',
+						data: '',
+						dataType: 'json',
+						success: function(data){
+							let options = "<option value=''>====请选择====</option>";
+							for(let dict of data){
+								options += "<option value='"+dict.value+"'>"+dict.name+"</option>";
+							}
+							$('#'+groupId).html(options);
+						}
+					});
+				}			
+			}
+			
+			function querySpan(groupId){
+				$.ajax({
+					url : path + '/dict/' + groupId,
+					type: 'GET',
+					data: '',
+					dataType: 'json',
+					success: function(data){
+						let str = '';
+						for(let dict of data){
+							str += 
+								`
+								<span value='${dict.value}' name='${dict.name}' onclick="queryBySpan('${dict.groupId},${dict.value}')" style='font-size:20px;margin-right:10px;'>${dict.name}</span>
+								`
+						}
+						$('#' + groupId).html(str);
+					}
+				});
+			}
+			
+			function queryBySpan(data){
+				let groupId = data.split(',')[0];
+				let value = data.split(',')[1];
+				priceList = groupId == 'price' ? value : priceList;
+				vehicleAge = groupId == 'vehicle_age' ? value : vehicleAge;
+				queryCar();
+			}
+			
+			let pn=1;
+            let ps=8;
+            let pre,next,end;
+            
+
+            $("#first").on("click",function () {
+            	queryCar(1,ps);
+            });
+            $("#pre").on("click",function () {
+            	queryCar(pre,ps);
+            });
+            $("#next").on("click",function () {
+            	queryCar(next,ps);
+            });
+            $("#end").on("click",function () {
+            	queryCar(end,ps);
+            });
+            
+            $('#level').change(function(){
+            	queryCar()
+            })
+             
+            $('#gearbox').change(function(){
+            	queryCar()
+            })
+            
+            $('#output_volume').change(function(){
+            	queryCar()
+            })
+            
+            $('#location').blur(function(){
+            	locations = $('#location').val()
+            	queryCar()
+            })
+			
+			function queryCar(pn,ps){
+				
+				let level = $('#level').val() || ''
+				let gearbox = $('#gearbox').val() || ''
+				let output_volume = $('#output_volume').val() || ''
+				
+				$.post(
+					path + '/car/queryCar',
+					{pageNumber:pn,pageSize:ps,brand:brand,series:series,level:level,gearbox:gearbox,
+						outputVolume:output_volume,location:locations,priceList:priceList,vehicleAge:vehicleAge},
+					data =>{
+						pre = data.pre;
+                        next = data.next;
+                        end = data.pageCount;
+
+                        let pics = "";
+                        console.log(data);
+                        $.each(data.rows, function (i, p) {
+                            pics+=	`
+                           		<div class="col-xs-6 col-md-3">
+                           	    	<div  class="thumbnail">
+                           	    		<img style='height: 200px; width: 300px' onclick="showPic('${p.pic}')" src='${path+p.pic}'>
+                           	    		<div class='caption'>
+                           	    			<div>
+                           	    				<h4 style='font-weight: bold;font-family: 等线;margin:0px 0px 15px 11px;'>${p.summary}</h4>
+                           	    				<h5 style='color: #989898;margin:0px 0px 15px 13px;font-size:15px;'>${p.mileage}万公里  / ${p.licensingTime} / ${p.location} / 会员商家</h5>
+                           	    				<h4 style='color: #F9712A; font-weight: bold;margin-left: 13px;font-size:22px;'>
+                           	    					${p.price}<span style="font-size:17px;">万</span>
+                           	    					<span style='color: #9A9A9A; margin-left:15px;text-decoration:line-through'>${p.price+20}万</span>
+                           	    					<span style='border:1px solid #99D5B4;color:#32BA79;font-family: 宋体;font-size:20px;padding:2px 5px;margin-left: 80px;'>新上</span>
+                           	    					<span style='border:1px solid #99D5B4;color:#32BA79;font-family: 宋体;font-size:20px;padding:2px 5px;margin-left: 5px;'>质保</span>
+                           	    				</h4>
+                           	    			</div>
+                           	    		</div>
+                           	    	</div>
+                           	  	</div>
+                          		` 
+                        });
+                        $("#car").html(pics);
+					},
+					'json'
+				)
+			}
+			
+			function showPic(pic){
+				debugger;
+				let str = `<img src="${path+pic}" style='width: 500px;height:500px'/>`
+				
+				$('#phono').html(str);
+				$('#myModal').modal("show");
+			}
+		</script>
+	</body>
+</html>

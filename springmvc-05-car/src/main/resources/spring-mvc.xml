@@ -16,6 +16,8 @@
 			expression="org.springframework.stereotype.Controller" />
 		<context:include-filter type="annotation"
 			expression="org.springframework.web.bind.annotation.RestController" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
 
 		<context:exclude-filter type="annotation"
 			expression="org.springframework.stereotype.Service" />
@@ -29,7 +31,7 @@
 	<!-- 3.静态文件交由Servlet容器处理 -->
 	<mvc:default-servlet-handler />
 
-	<!-- 访问本地文件系统 图片访问方式-->
+	<!-- 访问本地文件系统 图片访问方式 -->
 	<mvc:resources location="file:f:/foto/" mapping="/pic/**" />
 
 	<!-- 整合Thymeleaf -->

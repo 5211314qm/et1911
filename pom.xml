@@ -124,6 +124,13 @@
 				<artifactId>logback-classic</artifactId>
 				<version>1.2.3</version>
 			</dependency>
+			
+			<!-- 使用hibernate-validator实现后端校验 -->
+			<dependency>
+				<groupId>org.hibernate.validator</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>6.1.2.Final</version>
+			</dependency>
 
 		</dependencies>
 	</dependencyManagement>

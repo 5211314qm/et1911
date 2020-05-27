@@ -9,53 +9,222 @@
 
 	<!-- useCache="false"表示不使用缓存 -->
 
-	<select id="queryList" useCache="false" parameterType="string"
-		resultType="dict">
-		SELECT id,
-		group_id AS groupId,
-		name,
-		value,
-		sort
-		FROM
-		t_springmvc_dict
-		where group_id = #{value}
-		ORDER BY sort
-	</select>
-
 	<insert id="addCar" parameterType="car">
-		INSERT INTO t_springmvc_car 
+		INSERT INTO t_springmvc_car
 		(
-			id,
-			brand,
-			series,
-			price,
-			licensing_time,
-			level,
-			gearbox,
-			output_volume,
-			mileage,
-			location,
-			pic,
-			summary,
-			create_time
+		id,
+		brand,
+		series,
+		price,
+		licensing_time,
+		level,
+		gearbox,
+		output_volume,
+		mileage,
+		location,
+		pic,
+		summary,
+		create_time
 		)
 		values (
-			null,
-			#{brand},
-			#{series},
-			#{price},
-			#{licensingTime},
-			#{level},
-			#{gearbox},
-			#{outputVolume},
-			#{mileage},
-			#{location},
-			#{pic},
-			#{summary},
-			NOW()
+		null,
+		#{brand},
+		#{series},
+		#{price},
+		#{licensingTime},
+		#{level},
+		#{gearbox},
+		#{outputVolume},
+		#{mileage},
+		#{location},
+		#{pic},
+		#{summary},
+		NOW()
 		)
 	</insert>
 
+	<select id="queryBrand" resultType="string">
+		SELECT brand
+		FROM
+		t_springmvc_car
+		group by brand
+	</select>
 
+	<select id="querySeries" parameterType="string"
+		resultType="string">
+		SELECT DISTINCT(series)
+		FROM t_springmvc_car
+		<where>
+			<if test="_parameter != '' ">
+				brand = #{value}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryCar" parameterType="carVo" resultType="carVo">
+		SELECT
+			t.id,
+			t.brand,
+			t.series,
+			t.price,
+			t.licensing_time as licensingTime,
+			t.level,
+			t.gearbox,
+			t.output_volume as outputVolume,
+			t.mileage,
+			t.location,
+			t.pic,
+			t.summary,
+			t.create_time as createTime,
+			t2.name as levelName,
+			t3.name as gearboxName,
+			t4.name as outputVolumeName
+		FROM
+		t_springmvc_car t
+		LEFT JOIN t_springmvc_dict t2 on t.level = t2.value AND t2.group_id = 'level'
+		LEFT JOIN t_springmvc_dict t3 on t.gearbox = t3.value AND t3.group_id = 'gearbox'
+		LEFT JOIN t_springmvc_dict t4 on t.output_volume = t4.value AND t4.group_id = 'output_volume'
+		<where>
+			<if test="brand != null and brand != '' ">
+				AND brand = #{brand}
+			</if>
+			
+			<if test="series != null and series != '' ">
+				AND series = #{series}
+			</if>
+			
+			<if test="level != null and level != '' ">
+				AND level = #{level}
+			</if>
+			
+			<if test="gearbox != null and gearbox != '' ">
+				AND gearbox = #{gearbox}
+			</if>
+			
+			<if test="outputVolume != null and outputVolume != '' ">
+				AND output_volume = #{outputVolume}
+			</if>
+			
+			<if test="location != null and location != '' " >
+				AND location LIKE CONCAT('%',#{location},'%')
+			</if>
+			
+			<if test="priceMapList != null and priceMapList.size() != 0 ">
+				AND
+				<foreach collection="priceMapList" item="priceMap"
+				 open="(" close=")" separator="OR">
+					price between #{priceMap.start} and #{priceMap.end}
+				</foreach>
+			</if>
+			
+			<if test="startYear !=null and startYear != 0">
+				AND str_to_date(licensing_time, '%Y-%m') >= 
+				date_sub(curdate(),interval #{startYear} YEAR)
+			</if>
+			
+			<if test="endYear !=null and endYear != 0">
+				<![CDATA[
+				AND str_to_date(licensing_time, '%Y-%m') <= 
+				date_sub(curdate(),interval #{endYear} YEAR)
+				]]>
+			</if>
+			
+		</where>
+	</select>
+
+	<select id="queryList" parameterType="carVo" resultType="carVo">
+		SELECT
+			t.id,
+			t.brand,
+			t.series,
+			t.price,
+			t.licensing_time as licensingTime,
+			t.level,
+			t.gearbox,
+			t.output_volume as outputVolume,
+			t.mileage,
+			t.location,
+			t.pic,
+			t.summary,
+			t.create_time as createTime,
+			t2.name as levelName,
+			t3.name as gearboxName,
+			t4.name as outputVolumeName
+		FROM
+		t_springmvc_car t
+		LEFT JOIN t_springmvc_dict t2 on t.level = t2.value AND t2.group_id = 'level'
+		LEFT JOIN t_springmvc_dict t3 on t.gearbox = t3.value AND t3.group_id = 'gearbox'
+		LEFT JOIN t_springmvc_dict t4 on t.output_volume = t4.value AND t4.group_id = 'output_volume'
+		<where>
+			<if test="brand != null and brand != '' ">
+				AND brand = #{brand}
+			</if>
+			
+			<if test="series != null and series != '' ">
+				AND series = #{series}
+			</if>
+			
+			<if test="level != null and level != '' ">
+				AND level = #{level}
+			</if>
+			
+			<if test="gearbox != null and gearbox != '' ">
+				AND gearbox = #{gearbox}
+			</if>
+			
+			<if test="outputVolume != null and outputVolume != '' ">
+				AND output_volume = #{outputVolume}
+			</if>
+			
+			<if test="location != null and location != '' " >
+				AND location LIKE CONCAT('%',#{location},'%')
+			</if>
+			
+			<if test="priceMapList != null and priceMapList.size() != 0 ">
+				AND
+				<foreach collection="priceMapList" item="priceMap"
+				 open="(" close=")" separator="OR">
+					price between #{priceMap.start} and #{priceMap.end}
+				</foreach>
+			</if>
+			
+			<if test="startYear !=null and startYear != 0">
+				AND str_to_date(licensing_time, '%Y-%m') >= 
+				date_sub(curdate(),interval #{startYear} YEAR)
+			</if>
+			
+			<if test="endYear !=null and endYear != 0">
+				<![CDATA[
+				AND str_to_date(licensing_time, '%Y-%m') <= 
+				date_sub(curdate(),interval #{endYear} YEAR)
+				]]>
+			</if>
+			
+		</where>
+	</select>
+	
+	<!-- 查询所有品牌 -->
+	<select id="getAllBrand" resultType="string">
+		SELECT brand
+		FROM t_springmvc_car
+		GROUP BY brand
+	</select>
+	
+	<!-- 查询所有车系 -->
+	<select id="getSeriesByBrand" parameterType="string" resultType="string">
+		SELECT 	series
+		FROM t_springmvc_car
+		<where>
+			<if test="brand != null and brand != '' ">
+				brand = #{brand}
+			</if>
+		</where>
+		GROUP BY series
+		<if test="brand == null or brand == '' ">
+			limit 10
+		</if>
+	</select>
+	
+	
 
 </mapper>
