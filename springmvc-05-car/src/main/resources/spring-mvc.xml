@@ -30,6 +30,26 @@
 
 	<!-- 3.静态文件交由Servlet容器处理 -->
 	<mvc:default-servlet-handler />
+	
+	<mvc:view-controller path="/" view-name="index"/>
+	
+	<mvc:view-controller path="/user/toLogin" view-name="login"/>
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- 配置需要拦截的地址，/**表示拦截所有层级的请求 -->
+			<mvc:mapping path="/**"/>
+			
+			<!-- 配置不需要拦截的请求 -->
+			<mvc:exclude-mapping path="/static/**"/>
+			<mvc:exclude-mapping path="/code"/>
+			<mvc:exclude-mapping path="/user/toLogin"/>
+			<mvc:exclude-mapping path="/user/login"/>
+			
+			<!-- 配置登录拦截器 -->
+			<bean class="com.etoak.interceptor.LoginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
 
 	<!-- 访问本地文件系统 图片访问方式 -->
 	<mvc:resources location="file:f:/foto/" mapping="/pic/**" />

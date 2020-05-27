@@ -102,6 +102,12 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
+		<!-- 用于加解密的工具包 -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<finalName>springmvc-05-car</finalName>

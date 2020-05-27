@@ -51,6 +51,6 @@ public class IndexController {
 		userList.add(new User(4,"李四","",22));
 		
 		// webapp/templates/index.html
-		return "index";
+		return "index2";
 	}
 }

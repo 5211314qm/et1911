@@ -16,7 +16,7 @@ public class VerifyCode {
 
 	public BufferedImage createImage() {
 		// 图片宽度
-		int width = 105;
+		int width = 90;
 		// 图片高度
 		int height = 32;
 
