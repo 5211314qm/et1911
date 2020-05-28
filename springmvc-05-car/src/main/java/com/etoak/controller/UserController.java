@@ -43,7 +43,7 @@ public class UserController {
 	 * @param code
 	 * @param request
 	 * @return
-	 * @throws E7t1911LoginException 
+	 * @throws Et1911LoginException 
 	 */
 	@PostMapping("/login")
 	public String login(@RequestParam String name,@RequestParam String password,@RequestParam String code,
