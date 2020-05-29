@@ -16,7 +16,8 @@
 		<module>springmvc-04-param</module>
 		<module>springmvc-05-car</module>
 		<module>et1911-activemq</module>
-	</modules>
+        <module>et1911-webservice</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
